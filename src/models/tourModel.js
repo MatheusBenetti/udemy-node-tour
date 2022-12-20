@@ -32,7 +32,7 @@ const tourSchema = new mongoose.Schema({
         type: String,
         required: [true, 'People must know if they are able go to the tour'],
     },
-    summery: {
+    summary: {
         type: String,
         trim: true,
     },
