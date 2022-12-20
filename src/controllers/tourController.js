@@ -1,5 +1,12 @@
 const Tour = require('../models/tourModel');
 
+exports.aliasTopTours = async (req, res, next) => {
+    req.query.limit = '5';
+    req.query.sort = 'price,-ratingAverage';
+    req.query.fields = 'name,price,ratingAverage,summary,difficulty';
+    next();
+};
+
 exports.getAllTours = async (req, res) => {
     try {
         const queryObject = { ...req.query };
@@ -113,15 +120,22 @@ exports.updateTour = async (req, res) => {
 
 exports.deleteTour = async (req, res) => {
     try {
-        await Tour.findByIdAndDelete(req.params.id);
+        const tour = await Tour.findByIdAndDelete(req.params.id);
+
+        if (!tour) {
+            throw new Error('No tour registered.');
+        }
+
         res.status(200).json({
             status: 'Success!',
-            message: 'Tour deleted!',
+            data: {
+                tour,
+            },
         });
     } catch (err) {
         res.status(404).json({
             status: 'Fail!',
-            message: err,
+            message: 'No tour registered.',
         });
     }
 };
