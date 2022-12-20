@@ -1,8 +1,9 @@
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-const app = require('./app');
 
 dotenv.config();
+
+const app = require('./app');
 
 // const database = process.env.DATABASE_CONNECTION;
 
