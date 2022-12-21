@@ -11,6 +11,8 @@ router
 
 router.route('/tour-stats').get(tourController.getTourStats);
 
+router.route('/:year').get(tourController.getMonthlyPlan);
+
 router
     .route('/')
     .get(tourController.getAllTours)
