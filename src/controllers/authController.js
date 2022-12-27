@@ -14,7 +14,8 @@ exports.signUp = catchAsync(async (req, res, next) => {
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
-    confirmPassword: req.body.confirmPassword
+    confirmPassword: req.body.confirmPassword,
+    ...req.body
   });
 
   const token = signToken(newUser._id);
@@ -67,13 +68,13 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-  const freshUser = await User.findById(decoded.id);
+  const currentUser = await User.findById(decoded.id);
 
-  if (!freshUser) {
+  if (!currentUser) {
     return next(new AppError('The token is no longer valid.', 401));
   }
 
-  if (freshUser.changePasswordAfterLogin(decoded.iat)) {
+  if (currentUser.changePasswordAfterLogin(decoded.iat)) {
     return next(
       new AppError(
         'User recently changed the password! Please log in again.',
@@ -82,7 +83,18 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  req.user = freshUser;
+  req.user = currentUser;
 
   next();
 });
+
+exports.restrictTo =
+  (...roles) =>
+  (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action.', 403)
+      );
+    }
+    next();
+  };
