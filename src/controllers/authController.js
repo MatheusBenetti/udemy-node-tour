@@ -11,24 +11,22 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN
   });
 
-exports.signUp = catchAsync(async (req, res, next) => {
-  const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    confirmPassword: req.body.confirmPassword,
-    ...req.body
-  });
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
 
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
+  res.status(statusCode).json({
     status: 'Success!',
     token,
     data: {
-      user: newUser
+      user
     }
   });
+};
+
+exports.signUp = catchAsync(async (req, res, next) => {
+  const newUser = await User.create(req.body);
+
+  createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -44,12 +42,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Invalid email or password!', 401));
   }
 
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'Success!',
-    token
-  });
+  createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -165,10 +158,23 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   await user.save();
 
-  const token = signToken(user._id);
+  createSendToken(user, 200, res);
+});
 
-  res.status(200).json({
-    status: 'Success!',
-    token
-  });
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    return next(new AppError('No user found on the system.', 404));
+  }
+
+  if (!user.correctPassword(req.body.currentPassword, user.password)) {
+    return next(new AppError('Your current password is wrong!', 401));
+  }
+
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  await user.save();
+
+  createSendToken(user, 200, res);
 });
