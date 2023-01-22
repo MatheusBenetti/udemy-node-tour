@@ -2,6 +2,8 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
 
 const globalErrorHandler = require('./src/controllers/errorController');
 const AppError = require('./src/utils/appErrors');
@@ -20,6 +22,10 @@ const limiter = rateLimit({
   message: 'Too many request from this IP, please try again in an hour!'
 });
 app.use('/api', limiter);
+
+app.use(mongoSanitize());
+
+app.use(xss());
 
 app.use(express.json());
 
