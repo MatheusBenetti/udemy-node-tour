@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const globalErrorHandler = require('./src/controllers/errorController');
 const AppError = require('./src/utils/appErrors');
@@ -8,6 +9,8 @@ const tourRouter = require('./src/routes/tourRoutes');
 const userRouter = require('./src/routes/userRoutes');
 
 const app = express();
+
+app.use(helmet());
 
 app.use(morgan('dev'));
 
