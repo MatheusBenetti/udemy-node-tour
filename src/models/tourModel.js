@@ -90,6 +90,12 @@ const tourSchema = new mongoose.Schema(
       }
     ],
     guides: Array
+    // guides: [
+    //     {
+    //         type: mongoose.Schema.ObjectId,
+    //         ref: 'User'
+    //     }
+    // ]
   },
   {
     toJSON: { virtuals: true },
