@@ -54,6 +54,6 @@ exports.getUsersById = (req, res) => {};
 
 exports.createUsers = (req, res) => {};
 
-exports.updateUsers = (req, res) => {};
+exports.updateUsers = factory.updateOne(User);
 
 exports.deleteUsers = factory.deleteOne(User);
