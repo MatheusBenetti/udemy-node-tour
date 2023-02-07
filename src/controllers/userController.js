@@ -52,7 +52,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 
 exports.getUsersById = (req, res) => {};
 
-exports.createUsers = (req, res) => {};
+exports.createUsers = factory.createOne(User);
 
 exports.updateUsers = factory.updateOne(User);
 
